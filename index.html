@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Address-bar tint. The dark value is the default for anyone whose script
+         never runs; the inline block below rewrites it before paint, and
+         useTheme keeps it in step on every toggle. Both values must match `--bg`
+         in src/index.css. Declared before the script on purpose, so the script
+         can find it. -->
+    <meta name="theme-color" content="#080a10" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Resolve the theme before first paint. Without this the page renders dark,
+         then snaps to light once React mounts, which is a visible flash on every
+         load for anyone whose system prefers light. Deliberately inline and
+         blocking: this is the one script that must run before paint, and it is a
+         few lines. The markup it sets is what `[data-theme]` keys off in
+         src/index.css. Keep it in sync with src/hooks/useTheme.ts. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme")
+          var theme =
+            saved === "light" || saved === "dark"
+              ? saved
+              : window.matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark"
+
+          document.documentElement.dataset.theme = theme
+
+          if (theme === "light") {
+            var meta = document.querySelector('meta[name="theme-color"]')
+
+            if (meta) {
+              meta.setAttribute("content", "#f6f7fb")
+            }
+          }
+        } catch (error) {
+          document.documentElement.dataset.theme = "dark"
+        }
+      })()
+    </script>
+
+    <!-- Edit these, or leave them and let `src/data/profile.ts` stay the
+         single source of truth for everything rendered in the page. -->
+    <title>Yi YongSinh — Backend Developer</title>
+    <meta
+      name="description"
+      content="Backend developer building secure, production-ready APIs with Java, Spring Boot, Laravel, PostgreSQL and Docker, with React and TypeScript on the front end."
+    />
+    <meta name="author" content="Yi YongSinh" />
+
+    <!-- Social previews. Replace the URL with the live domain once deployed. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Yi YongSinh — Backend Developer" />
+    <meta
+      property="og:description"
+      content="Secure, production-ready APIs with Java, Spring Boot, Laravel, PostgreSQL and Docker."
+    />
+    <meta property="og:url" content="https://example.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Yi YongSinh — Backend Developer" />
+    <meta
+      name="twitter:description"
+      content="Secure, production-ready APIs with Java, Spring Boot, Laravel, PostgreSQL and Docker."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Yi YongSinh",
+        "jobTitle": "Backend Developer",
+        "email": "mailto:you@example.com",
+        "url": "https://example.com",
+        "sameAs": ["https://github.com/your-handle"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="YS monogram">
+  <rect width="64" height="64" rx="14" fill="#080a10"/>
+  <path d="M19 17 32 33 45 17M32 33v15"
+        fill="none"
+        stroke="#7c7fff"
+        stroke-width="5.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <circle cx="46.5" cy="46.5" r="3.5" fill="#a2a4ff"/>
+</svg>

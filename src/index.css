@@ -1,0 +1,3239 @@
+/* ==================================================================
+   typescript-web — portfolio stylesheet
+   Single global file, no preprocessor. Section order:
+   tokens → reset → base → utilities → buttons → layout → navbar →
+   hero → about → skills → timeline → projects → contact → footer →
+   responsive → motion/print
+   ================================================================== */
+
+/* =========================
+   TOKENS
+   ========================= */
+
+:root {
+  color-scheme: dark;
+
+  /* surfaces */
+  --bg: #080a10;
+  --bg-elevated: #0f121b;
+  --surface: rgba(255, 255, 255, 0.025);
+  --surface-hover: rgba(255, 255, 255, 0.055);
+
+  /* lines */
+  --border: #1e2230;
+  --border-strong: #2c3243;
+
+  /* text */
+  --text: #f2f5fa;
+  --text-muted: #9aa2b4;
+  --text-subtle: #7d8598;
+
+  /* accent */
+  --accent: #7c7fff;
+  --accent-bright: #a2a4ff;
+  --accent-dim: rgba(124, 127, 255, 0.13);
+  --accent-ring: rgba(124, 127, 255, 0.4);
+  /* `--accent` stays vivid for borders, rings and glows, but white text on it
+     only reaches 3.3:1. Filled buttons use this darker sibling so their label
+     clears 4.5:1 — the button text is 0.9rem/600, which is not WCAG "large". */
+  --accent-solid: #5f61e8;
+
+  /* status */
+  --danger: #ff9a9a;
+  --success: #86e0ac;
+
+  /* layout */
+  --container: 1160px;
+  --gutter: 24px;
+  --nav-height: 72px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* type */
+  --font-sans:
+    Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  --font-mono:
+    "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+
+  /* motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --fast: 140ms;
+  --base: 240ms;
+
+  /* elevation */
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  --card-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+
+  /* Theme-dependent surfaces and text. These were hardcoded hex values that
+     only ever worked on the dark background; they became tokens when light
+     mode arrived. */
+  --on-accent: #ffffff;
+  --text-strong: #d8dde8;
+  --bg-translucent: rgba(8, 10, 16, 0.85);
+  --input-bg: rgba(6, 8, 13, 0.6);
+  --meter-track: rgba(255, 255, 255, 0.07);
+  --meter-track-hover: rgba(255, 255, 255, 0.11);
+
+  /* coloured glows, so the light theme can dim them */
+  --accent-glow: rgba(124, 127, 255, 0.16);
+  --accent-glow-strong: rgba(124, 127, 255, 0.28);
+  --success-glow: rgba(134, 224, 172, 0.16);
+  --success-glow-strong: rgba(134, 224, 172, 0.45);
+  --success-glow-off: rgba(134, 224, 172, 0);
+  --danger-glow: rgba(255, 154, 154, 0.16);
+
+  --aurora-teal: #4fd1c5;
+  --aurora-violet: #c084fc;
+
+  /* ambient backdrop strength */
+  --aurora-a: 0.34;
+  --aurora-b: 0.16;
+  --aurora-c: 0.14;
+
+  /* Hero portrait glow. Two stops rather than one, because a single flat alpha
+     to `transparent` fades through black and muddies the accent on the way
+     down. The mid stop is the same hue at a lower alpha, so the bloom keeps
+     its colour all the way out. */
+  /* Hero portrait panel. Four tokens: the fill, a faint accent wash over it, the
+     border, and the shadow.
+
+     The fill and border are dedicated tokens rather than `--surface` /
+     `--border-strong` because the hero sits on the aurora-tinted backdrop, not on
+     flat `--bg`, and the shared tokens happen to land almost exactly on the
+     rendered colour of the page behind this specific panel. Measured against real
+     pixels beside the panel: shared `--surface` over `--bg` scored 1.01:1 against
+     it and a `--border` edge scored 1.00:1 — the panel was invisible, which is
+     what made the first attempt at this read as "no background at all".
+
+     These values are picked to clear 1.5:1 border-to-fill, which is the
+     measurement that decides whether a tile edge reads as a deliberate surface.
+     Both themes needed their own value; the light one is the interesting case,
+     because it sits on a violet backdrop that is *darker* than white, so a card
+     tinted from `--surface` came out darker than the page behind it. */
+  --portrait-panel-bg: #141826;
+  --portrait-panel-wash: rgba(124, 127, 255, 0.09);
+  --portrait-panel-wash-fade: rgba(124, 127, 255, 0.03);
+  --portrait-panel-border: #3a4157;
+  --portrait-shadow: rgba(0, 0, 0, 0.38);
+
+  /* starfield, in the suit colours */
+  --star-red: #ff5566;
+  --star-blue: #7fb2ff;
+  --star-bright: #ffd9de;
+  --star-opacity: 0.7;
+
+  /* Where the field sits, and how spread out it is. One knob each, because
+     these are the two things anyone actually wants to change about a sky.
+
+     `--star-tile` is the spacing between stars, not their size: the dots keep
+     the pixel diameters baked into the gradients, so raising the tile thins the
+     field instead of growing it. The other three layers derive from this one
+     (×1.46875, ×1.90625 and ×2.5625, which are the 470px, 610px and 820px tiles
+     at the 320px default) so the four stay in the same mismatched ratio that
+     stops the composite pattern from visibly repeating. Changing all four by
+     hand is how you get a grid.
+
+     `--star-shift-*` slides the whole field. It is a `background-position`, and
+     drift animates `translate` on the same element, so the two compose instead
+     of overwriting each other — a shifted field still drifts its full range.
+
+     Measured boundary: the navbar band is masked, so the logo and links stay at
+     or above 5.2:1 at any shift. The hero paragraph is not masked, and at
+     `--star-shift-x: -200px` a 1px red star landed on a glyph pixel and took
+     that one pixel to 2.5:1. Shifts within roughly ±150px measured clean in both
+     themes; if you go past that, re-check the paragraph rather than assuming. */
+  --star-tile: 320px;
+  --star-shift-x: 0px;
+  --star-shift-y: 0px;
+
+  /* the web in the corner, and the halftone inside it */
+  --web-line: rgba(255, 255, 255, 0.12);
+  --web-opacity: 0.6;
+
+  /* the faint tinted wash behind the page */
+  --ambient-a: rgba(124, 127, 255, 0.14);
+  --ambient-b: rgba(124, 127, 255, 0.06);
+}
+
+/* ------------------------------------------------------------------
+   LIGHT THEME
+
+   Applied via `data-theme` on <html>, set before first paint by the
+   inline script in index.html. Only the tokens change — no component
+   or rule below this block needs to know which theme is active.
+   ------------------------------------------------------------------ */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f6f7fb;
+  --bg-elevated: #ffffff;
+  --surface: rgba(16, 19, 28, 0.025);
+  --surface-hover: rgba(16, 19, 28, 0.05);
+
+  --border: #e2e5ee;
+  --border-strong: #c6cbd9;
+
+  --text: #0f121b;
+  --text-muted: #545c70;
+  /* Darker than it looks like it needs to be. Measured against the *rendered*
+     background, not `--bg`: the ambient gradient on `body` darkens it a little,
+     and the aurora drifts, so the local backdrop moves. At #646c80 the small
+     text using this token measured 4.48:1 — just under 4.5, and not by much
+     enough to be sure of. This holds 4.89:1 at the darkest the backdrop gets. */
+  --text-subtle: #5f6679;
+  --text-strong: #3b4252;
+
+  /* Darker than the dark-theme accent: white text sits on these, and
+     `--accent-bright` is also used as *text* on a white background. */
+  --accent: #4f52e8;
+  --accent-bright: #4346d6;
+  --accent-dim: rgba(79, 82, 232, 0.1);
+  --accent-ring: rgba(79, 82, 232, 0.35);
+  --accent-solid: #4f52e8;
+
+  --danger: #c0392b;
+  --success: #1a7a41;
+
+  --shadow: 0 24px 60px rgba(16, 19, 28, 0.12);
+  --card-shadow: 0 18px 40px rgba(16, 19, 28, 0.14);
+
+  --on-accent: #ffffff;
+  --bg-translucent: rgba(246, 247, 251, 0.85);
+  --input-bg: #ffffff;
+  --meter-track: rgba(16, 19, 28, 0.08);
+  --meter-track-hover: rgba(16, 19, 28, 0.13);
+
+  --accent-glow: rgba(79, 82, 232, 0.14);
+  --accent-glow-strong: rgba(79, 82, 232, 0.22);
+  --success-glow: rgba(31, 138, 76, 0.18);
+  --success-glow-strong: rgba(31, 138, 76, 0.4);
+  --success-glow-off: rgba(31, 138, 76, 0);
+  --danger-glow: rgba(192, 57, 43, 0.16);
+
+  /* The blobs are far more visible against white, so they come down hard. */
+  --aurora-a: 0.1;
+  --aurora-b: 0.06;
+  --aurora-c: 0.05;
+
+  /* Light overrides for the portrait panel. Per the same rule as every other
+     colour here: an alpha that reads as a faint wash on near-black is a
+     completely different strength on white.
+
+     The fill is opaque white rather than `--surface`. Over `#f6f7fb` the shared
+     `--surface` tint comes out at `(240,241,245)`, but the aurora behind the
+     hero renders to about `(229,230,243)` — the card was darker than the page
+     behind it, which is why the panel measured 1.01:1 and disappeared. Pure
+     white reads as a clean tile against the violet backdrop.
+
+     The wash drops from 0.09 to 0.05 for the same reason it always needs a light
+     override: 0.09 on white is a visible lilac block, not a hint of one.
+
+     The border is one step past `--border-strong`. Against the measured white
+     fill, `--border-strong` clears 1.53:1 but only 1.31:1 against the backdrop;
+     this clears 1.67:1 and 1.42:1, so the tile holds its edge from either side. */
+  --portrait-panel-bg: #ffffff;
+  --portrait-panel-wash: rgba(79, 82, 232, 0.05);
+  --portrait-panel-wash-fade: rgba(79, 82, 232, 0.02);
+  --portrait-panel-border: #bcc3d5;
+  --portrait-shadow: rgba(16, 19, 28, 0.12);
+
+  /* Stars are ink here, not light: on a white background a bright starfield
+     reads as dirt rather than as sky, so the tokens flip to their most saturated
+     form and the whole field drops to half strength. */
+  --star-red: #e62429;
+  --star-blue: #2f6fd0;
+  --star-bright: #ff5a6a;
+  --star-opacity: 0.5;
+
+  /* On white the web can be a real blue rather than a white at low alpha, which
+     is what it has to be on the dark background — white line over near-black
+     reads, blue line over near-white does not. */
+  --web-line: rgba(22, 86, 160, 0.2);
+  --web-opacity: 0.5;
+
+  --ambient-a: rgba(79, 82, 232, 0.08);
+  --ambient-b: rgba(79, 82, 232, 0.04);
+}
+
+/* =========================
+   RESET
+   ========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* =========================
+   BASE
+   ========================= */
+
+html {
+  scroll-behavior: smooth;
+  /* keeps anchored sections clear of the sticky navbar */
+  scroll-padding-top: calc(var(--nav-height) + 12px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 78% -5%, var(--ambient-a), transparent 32%),
+    radial-gradient(circle at 12% 40%, var(--ambient-b), transparent 34%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--fast) var(--ease);
+}
+
+::selection {
+  background: var(--accent-solid);
+  color: var(--on-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Icons inherit the colour of whatever contains them. */
+.icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+}
+
+/* =========================
+   UTILITIES
+   ========================= */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--fast) var(--ease);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform var(--fast) var(--ease),
+    background-color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+
+.btn-primary {
+  background: var(--accent-solid);
+  color: var(--on-accent);
+}
+
+/* Hover keeps the same background on purpose. Lightening it to
+   `--accent-bright` would put the label back under 4.5:1 on the dark theme;
+   the lift plus the widened glow carries the affordance instead. */
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 30px var(--accent-glow-strong),
+    0 0 0 4px var(--accent-dim);
+}
+
+.btn-secondary {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text-strong);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  border-color: var(--border-strong);
+  color: var(--text-strong);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================
+   LAYOUT
+   ========================= */
+
+.section {
+  width: min(var(--container), 100% - var(--gutter) * 2);
+  margin-inline: auto;
+  padding-block: 104px;
+}
+
+/* =========================
+   SECTION HEADING
+   ========================= */
+
+.section-heading {
+  max-width: 680px;
+  margin-bottom: 56px;
+}
+
+.section-heading-center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.section-label::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.section-heading-center .section-label::before {
+  display: none;
+}
+
+.section-heading h2 {
+  margin-top: 14px;
+  font-size: clamp(1.9rem, 3.8vw, 3rem);
+}
+
+.section-heading p {
+  margin-top: 18px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+/* =========================
+   NAVBAR
+   ========================= */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--base) var(--ease),
+    border-color var(--base) var(--ease);
+}
+
+.navbar-scrolled {
+  border-bottom-color: var(--border);
+  background: var(--bg-translucent);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.navbar-inner {
+  width: min(var(--container), 100% - var(--gutter) * 2);
+  height: 100%;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.logo span {
+  color: var(--accent);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline: auto;
+}
+
+.nav-link {
+  position: relative;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  font-weight: 500;
+  transition:
+    color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease);
+}
+
+.nav-link:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.nav-link-active {
+  color: var(--text);
+}
+
+/* The underline itself is drawn in the MOTION block so the scaleX
+   transition lives next to the transform it animates. */
+
+.nav-cta {
+  padding: 10px 18px;
+  font-size: 0.9rem;
+}
+
+.menu-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease);
+}
+
+.menu-button:hover {
+  border-color: var(--accent);
+  background: var(--surface-hover);
+}
+
+.menu-button .icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---- theme toggle ---- */
+/* Same shape and hit area as .menu-button so the two controls line up without
+   either one needing a width hack. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  background: var(--surface-hover);
+  color: var(--text);
+  transform: rotate(-8deg);
+}
+
+.theme-toggle:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.theme-toggle-icon {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* Both icons are always in the DOM; CSS picks one per theme so toggling never
+   changes the shape of the control. `.icon` is display:block from the reset,
+   so it has to be explicitly positioned here. */
+.theme-toggle .icon {
+  position: absolute;
+  inset: 0;
+  width: 20px;
+  height: 20px;
+}
+
+:root[data-theme="dark"] .theme-icon-sun,
+:root:not([data-theme]) .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(-70deg) scale(0.6);
+}
+
+:root[data-theme="dark"] .theme-icon-moon,
+:root:not([data-theme]) .theme-icon-moon {
+  opacity: 1;
+  transform: none;
+}
+
+:root[data-theme="light"] .theme-icon-sun {
+  opacity: 1;
+  transform: none;
+}
+
+:root[data-theme="light"] .theme-icon-moon {
+  opacity: 0;
+  transform: rotate(70deg) scale(0.6);
+}
+
+.theme-toggle .icon {
+  transition:
+    opacity var(--base) var(--ease),
+    transform var(--base) var(--ease);
+}
+
+/* Reading-progress bar pinned to the bottom edge of the navbar. Its
+   transform is written by useScrollProgress; origin is the left edge. */
+.scroll-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+  transition: opacity var(--base) var(--ease);
+  pointer-events: none;
+}
+
+.navbar-scrolled .scroll-progress {
+  opacity: 1;
+}
+
+/* =========================
+   SOCIAL LINKS
+   ========================= */
+
+.hero-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition:
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease);
+}
+
+.social-link:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+.social-link .icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* =========================
+   HERO
+   ========================= */
+
+.hero {
+  display: grid;
+  /* Text gets the wider track. The name is the thing being sold, and the
+     visual is a supporting cutout — 1fr/0.95fr made them near-equal, which left
+     the portrait looking undersized in a column sized for it. */
+  grid-template-columns: 1.12fr 0.88fr;
+  align-items: center;
+  gap: 48px;
+  min-height: calc(100vh - var(--nav-height));
+  padding-block: 72px;
+}
+
+/* Grid children default to min-width:auto, which lets long words and the
+   portrait's intrinsic width push the column wider than its track instead of
+   shrinking. An `<img>` is the worst case: its intrinsic width is a hard floor
+   the track cannot compress. */
+.hero-content,
+.hero-visual,
+.project-content {
+  min-width: 0;
+}
+
+.hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 6px 14px 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-glow);
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4.6rem);
+  letter-spacing: -0.035em;
+}
+
+.hero-greeting {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.4em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text-subtle);
+}
+
+/* A flat accent fill, deliberately. This was a two-stop gradient clipped to the
+   glyphs with a shimmer sweeping across it, and it failed twice: a second
+   `background` on `.shimmer` overrode the gradient from the MOTION block, and
+   the `@supports` fallback that was supposed to rescue browsers without
+   `background-clip: text` used `currentColor`, which resolves to the
+   `color: transparent` set here — so it hid the name instead of showing it.
+
+   A solid `color` has none of those failure modes: nothing to override, nothing
+   to fall back from, no `background-clip` support required. It measures 4.78:1
+   on the dark backdrop and 4.96:1 on the light one, against a 3:1 bar for text
+   this size, so the accent survives without borrowing `--text` for contrast. */
+.hero-name {
+  color: var(--accent);
+  font-family: "Plus Jakarta Sans", Inter, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Open Sans", "Helvetica Neue", sans-serif;
+  font-weight: 700;
+}
+
+.hero-role {
+  margin-top: 20px;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  font-weight: 500;
+  color: var(--text-strong);
+}
+
+.hero-role span {
+  color: var(--text-subtle);
+}
+
+.hero-description {
+  max-width: 54ch;
+  margin-top: 22px;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.hero-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.hero-tech li {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-subtle);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+}
+
+/* =========================
+   HERO VISUAL
+
+   `position: relative` so the panel can be absolutely positioned against the
+   portrait and size itself to the image. */
+.hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ---- the portrait ---- */
+/* `position: relative` because `.hero-portrait-panel` below is absolutely
+   positioned against this box and extends past it by its negative `inset`. The
+   panel is a SIBLING of the `<img>`, not a wrapper — which is what lets the
+   cutout keep its own transparent edge while the panel supplies the fill and
+   border behind it.
+
+   `width` is a clamp so the cutout scales with the viewport instead of jumping
+   at the breakpoints. Capped at 350px, which is as large as it goes before it
+   starts competing with the 4.6rem name rather than supporting it. The visual
+   grid track is narrower than the text one, so anything larger reads as the
+   portrait shoving the layout sideways.
+
+   Still well under half the 800px source, so this stays a 2x image on every
+   display.
+
+   No `aspect-ratio`: the browser derives the box from the `width`/`height`
+   attributes in src/data/profile.ts, so the space is reserved before the image
+   finishes loading.
+
+   Deliberately no `transform` on this element or the image inside it. Its parent
+   `.hero-visual` runs `reveal-rise`, a filled animation, which beats `transform`
+   permanently. Nothing here needs a hover transform, so nothing here can lose
+   one. */
+.hero-portrait {
+  position: relative;
+  z-index: 1;
+  width: clamp(215px, 24vw, 350px);
+  flex: none;
+}
+
+.hero-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* A shallow, close drop shadow. It was 0 24px 40px at 0.55 alpha, which read
+     as a separate grey blob under the subject rather than as contact — the cutout
+     looked pasted on. Kept shallow and weak, it now does one job: stopping the
+     transparent edge from dissolving into the backdrop.
+
+     On `filter`, never `transform`, so it stays out of the chain the parent
+     entrance animation owns. */
+  filter: drop-shadow(0 12px 20px var(--portrait-shadow));
+}
+
+/* The panel behind the cutout.
+   Deliberately built from the same tokens as every other card on the site —
+   `--surface`, `--border`, `--radius-lg`, `--shadow` — so the hero reads as part
+   of one system rather than as a special case bolted onto it.
+
+   `inset: -24px` is the whole trick. This is absolutely positioned against
+   `.hero-portrait`, which is exactly the image's box, so a negative inset makes
+   the panel LARGER than the photo and leaves 24px of breathing room between the
+   subject and the panel's border.
+
+   That margin is not decoration. The source photo's subject is clipped at both
+   canvas edges and trimmed flush at the top — measured, the shoulders reach the
+   image edge with 2px to spare and the crown of the head with 1px. A panel sized
+   to the image would trace that clip with its border, which advertises the flaw
+   instead of hiding it. Insetting the photo inside the border moves the cut edge
+   into empty panel fill where it stops being readable as a cut.
+
+   `overflow: hidden` because the accent wash is painted on a `::before` inset
+   wider than the panel, and without clipping it would square off the rounded
+   corners. It does not clip the portrait: the `<img>` is a SIBLING of this
+   element, not a child, so the photo and its drop shadow both render clear of it.
+
+   `pointer-events: none` so it cannot swallow clicks meant for the image. */
+.hero-portrait-panel {
+  position: absolute;
+  inset: -24px;
+  z-index: 0;
+  overflow: hidden;
+  border: 1px solid var(--portrait-panel-border);
+  border-radius: var(--radius-lg);
+  background: var(--portrait-panel-bg);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+
+.hero-portrait-panel::before {
+  content: "";
+  position: absolute;
+  inset: -30% -10% -10% -10%;
+  background: linear-gradient(
+    170deg,
+    var(--portrait-panel-wash) 0%,
+    var(--portrait-panel-wash-fade) 55%,
+    transparent 100%
+  );
+}
+
+/* =========================
+   ABOUT
+   ========================= */
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.about-narrative {
+  display: grid;
+  gap: 20px;
+  max-width: 64ch;
+  color: var(--text-muted);
+  line-height: 1.85;
+}
+
+.about-narrative p:first-child {
+  color: var(--text-strong);
+  font-size: 1.1rem;
+}
+
+.about-aside {
+  display: grid;
+  gap: 28px;
+}
+
+.about-facts {
+  display: grid;
+  gap: 0;
+  padding: 8px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.about-fact {
+  display: grid;
+  gap: 4px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.about-fact:last-child {
+  border-bottom: 0;
+}
+
+.about-fact dt {
+  color: var(--text-subtle);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.about-fact dd {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.about-principles {
+  display: grid;
+  gap: 20px;
+}
+
+.about-principle {
+  padding-left: 18px;
+  border-left: 2px solid var(--accent-dim);
+}
+
+.about-principle h3 {
+  font-size: 0.98rem;
+}
+
+.about-principle p {
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* =========================
+   NOW
+   ========================= */
+
+.now-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.now-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+}
+
+.now-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.now-kind .icon {
+  width: 13px;
+  height: 13px;
+}
+
+.now-body h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.now-body p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.now-link {
+  display: inline-flex;
+  color: var(--text-subtle);
+  transition: color var(--fast) var(--ease);
+}
+
+.now-link .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.now-body h3 .now-link:hover,
+.now-body h3 .now-link:focus-visible {
+  color: var(--accent);
+}
+
+/* =========================
+   RECOGNITION
+   ========================= */
+
+.recognition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.recognition-link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  transition:
+    border-color var(--base) var(--ease),
+    background-color var(--base) var(--ease),
+    transform var(--base) var(--ease);
+}
+
+a.recognition-link:hover,
+a.recognition-link:focus-visible {
+  border-color: var(--accent);
+  background: var(--surface-hover);
+  transform: translateY(-3px);
+}
+
+.recognition-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.recognition-kind {
+  color: var(--accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.recognition-meta {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-subtle);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.recognition-link h3 {
+  font-size: 1.02rem;
+}
+
+.recognition-issuer {
+  color: var(--text-subtle);
+  font-size: 0.8rem;
+}
+
+.recognition-link p {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* =========================
+   SKILLS
+   ========================= */
+
+.skills-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.skill-group {
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  transition:
+    border-color var(--base) var(--ease),
+    transform var(--base) var(--ease);
+}
+
+/* No `transform` here. The hover lift lives in the MOTION block as
+   `--tilt-lift`, which the tilt transform chain composes with — declaring
+   `translateY(-4px)` in both places means one silently wins. */
+.skill-group:hover {
+  border-color: var(--border-strong);
+}
+
+.skill-group-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.skill-group-header h3 {
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+
+.skill-count {
+  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.skill-group-blurb {
+  margin-top: 8px;
+  color: var(--text-subtle);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.skill-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+.skill-item {
+  display: grid;
+  gap: 3px;
+}
+
+.skill-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.skill-detail {
+  color: var(--text-subtle);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* =========================
+   TIMELINE
+   ========================= */
+
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 44px;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 5px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    var(--accent),
+    var(--border) 25%,
+    var(--border) 75%,
+    transparent
+  );
+}
+
+.timeline-item {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+
+.timeline-marker {
+  position: absolute;
+  top: 8px;
+  left: -30px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.timeline-period {
+  color: var(--accent-bright);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.timeline-body h3 {
+  font-size: 1.3rem;
+}
+
+.timeline-organisation {
+  margin-top: 2px;
+  color: var(--text-subtle);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.timeline-summary {
+  max-width: 66ch;
+  margin-top: 12px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+.timeline-achievements {
+  display: grid;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.timeline-achievements li {
+  position: relative;
+  max-width: 66ch;
+  padding-left: 22px;
+  color: var(--text-muted);
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+.timeline-achievements li::before {
+  content: "";
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 10px;
+  height: 1px;
+  background: var(--accent);
+}
+
+/* =========================
+   PROJECTS
+   ========================= */
+
+.projects-list {
+  border-top: 1px solid var(--border);
+}
+
+.project-card {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 28px;
+  padding: 46px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-number {
+  padding-top: 6px;
+  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+
+.project-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.project-heading h3 {
+  font-size: clamp(1.4rem, 2.6vw, 1.95rem);
+  letter-spacing: -0.025em;
+}
+
+.project-scope {
+  padding: 4px 10px;
+  border: 1px solid var(--accent-ring);
+  border-radius: var(--radius-pill);
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.project-summary {
+  max-width: 66ch;
+  margin-top: 14px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.project-highlights {
+  display: grid;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.project-highlights li {
+  position: relative;
+  max-width: 68ch;
+  padding-left: 22px;
+  color: var(--text-muted);
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+.project-highlights li::before {
+  content: "";
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 10px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.project-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.project-tech li {
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-subtle);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.project-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.87rem;
+  font-weight: 600;
+  transition:
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease);
+}
+
+.project-links a:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+.project-links .icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* =========================
+   CONTACT
+   ========================= */
+
+.contact {
+  padding-block: 120px;
+}
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 60px;
+  padding: 56px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius-lg) + 6px);
+  background:
+    linear-gradient(150deg, var(--accent-dim), transparent 55%),
+    var(--bg-elevated);
+}
+
+.contact-info .section-heading {
+  margin-bottom: 40px;
+}
+
+.contact-details {
+  display: grid;
+  gap: 18px;
+}
+
+.contact-detail {
+  display: grid;
+  gap: 3px;
+}
+
+.contact-detail-label {
+  color: var(--text-subtle);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.contact-detail a,
+.contact-detail span:not(.contact-detail-label) {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.contact-detail a:hover {
+  color: var(--accent-bright);
+}
+
+.contact-socials {
+  display: grid;
+  gap: 12px;
+  margin-top: 34px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+}
+
+.contact-socials .hero-socials {
+  margin-top: 0;
+}
+
+/* FORM */
+
+.contact-form {
+  display: grid;
+  gap: 22px;
+}
+
+.form-group {
+  display: grid;
+  gap: 8px;
+}
+
+.form-group label {
+  color: var(--text-strong);
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  transition:
+    border-color var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease);
+}
+
+.form-group textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-subtle);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.form-group input[aria-invalid="true"],
+.form-group textarea[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.form-group input[aria-invalid="true"]:focus,
+.form-group textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px var(--danger-glow);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.84rem;
+}
+
+.form-success {
+  color: var(--success);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.form-status:empty {
+  display: none;
+}
+
+.submit-button {
+  justify-self: start;
+  border: 0;
+}
+
+/* =========================
+   FOOTER
+   =========================
+   One horizontal row: monogram, blurb, every nav link, socials, copyright and
+   the back-to-top link, all on one centred line. `flex-wrap` is what makes that
+   survive a narrow viewport — the row falls back to a centred stack instead of
+   overflowing — so there is no breakpoint to keep in sync. Centring is the
+   whole design: it reads as an end-of-page mark rather than a third of a layout
+   grid. */
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding-block: 48px;
+}
+
+.footer-content {
+  width: min(var(--container), 100% - var(--gutter) * 2);
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px 20px;
+  text-align: center;
+}
+
+/* Monogram and blurb share the row rather than stacking, so the brand cell is
+   only as tall as the text beside it. */
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Bigger than the navbar's. This is the last thing on the page and the one
+   thing that should still read as a signature. */
+.footer-brand .logo {
+  font-size: 1.5rem;
+}
+
+.footer-blurb {
+  max-width: 26ch;
+  color: var(--text-subtle);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* Wraps on narrow screens. `flex-wrap` rather than a `grid-auto-flow: column`
+   ladder: eight links cannot fit a 390px viewport in a single row, and wrapping
+   is the only version of "one row" that survives. */
+.footer-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+}
+
+.footer-nav a {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 8px;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  transition:
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease);
+}
+
+.social-icon:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+.social-icon .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.footer-copyright {
+  color: var(--text-subtle);
+  font-size: 0.78rem;
+}
+
+.back-to-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.back-to-top:hover {
+  color: var(--text);
+}
+
+.back-to-top .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 1024px) {
+  .hero {
+    gap: 44px;
+  }
+
+  .about-grid {
+    gap: 44px;
+  }
+
+  .contact-layout {
+    gap: 40px;
+    padding: 44px;
+  }
+}
+
+@media (max-width: 880px) {
+  :root {
+    --nav-height: 64px;
+  }
+
+  .section {
+    padding-block: 76px;
+  }
+
+  /* Mobile navigation collapses behind the toggle. */
+  .nav-links {
+    position: absolute;
+    top: calc(var(--nav-height) - 4px);
+    right: var(--gutter);
+    left: var(--gutter);
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    margin-inline: 0;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
+  }
+
+  .nav-links-open {
+    display: flex;
+  }
+
+  .nav-link {
+    padding: 12px 14px;
+  }
+
+  .nav-link-active {
+    background: var(--accent-dim);
+  }
+
+  .nav-link-active::after {
+    display: none;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+
+  .menu-button {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 52px;
+    padding-block: 56px;
+  }
+
+  /* Single column means the visual column is the full container width, so the
+     cutout centres in it rather than sitting against the left edge with a
+     column of dead space beside it. The glow is `position: absolute` inside
+     `.hero-visual`, so it centres with the portrait automatically. */
+  .hero-portrait {
+    width: min(70vw, 330px);
+  }
+
+  .hero-visual {
+    flex-direction: column;
+    align-items: center;
+  }  .about-grid,
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Three stat cards side by side stop being readable well before they stop
+     fitting, so they stack with the section. */
+  .stat-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 44px;
+  }
+
+  .stat {
+    padding: 20px 22px;
+  }
+
+  .contact-layout {
+    gap: 44px;
+    padding: 36px;
+  }
+}
+
+@media (max-width: 560px) {
+  .section {
+    padding-block: 60px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.1rem, 11vw, 3rem);
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .skills-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-group {
+    padding: 22px;
+  }
+
+  .project-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 34px 0;
+  }
+
+  .project-number {
+    padding-top: 0;
+  }
+
+  .timeline {
+    padding-left: 24px;
+  }
+
+  .timeline-marker {
+    left: -24px;
+  }
+
+  .timeline::before {
+    left: 4px;
+  }
+
+  .contact-layout {
+    padding: 26px;
+  }
+
+  .submit-button {
+    width: 100%;
+  }
+}
+
+/* =========================
+   MOTION / PRINT
+   ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .navbar,
+  .hero-actions,
+  .hero-socials,
+  .skip-link,
+  .contact-form-wrap,
+  .footer-nav,
+  .back-to-top,
+  .scroll-progress,
+  .aurora {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #111;
+  }
+
+  .section {
+    padding-block: 24px;
+  }
+
+  .hero {
+    min-height: 0;
+  }
+
+  /* Freeze every animated surface at its resting appearance. Print captures a
+     static frame, and a half-counted number or a collapsed meter would be a
+     lie on paper. */
+  .hero-content,
+  .hero-portrait {
+    opacity: 1 !important;
+    translate: none !important;
+  }
+
+  .tilt {
+    transform: none !important;
+  }
+
+  .tilt::after {
+    display: none;
+  }
+
+  .skill-meter-fill {
+    transform: scaleX(1) !important;
+  }
+}
+
+/* =========================
+   MOTION
+   ------------------------------------------------------------------
+   Everything below animates only `opacity`, `transform` or `filter`,
+   which the compositor can handle without layout or paint work.
+
+   Two independent mechanisms:
+     1. Hero entrance — pure CSS, runs once on mount, needs no JS.
+     2. Scroll reveal  — `useInView` sets `data-reveal-armed="hidden"`
+        on an element and removes it once it scrolls into view.
+
+   The reveal system never hides anything by itself: the attribute that
+   hides it is written by JS and deleted when revealed, so no-JS, missing
+   IntersectionObserver and reduced-motion all leave content visible.
+   ========================= */
+
+:root {
+  --reveal-shift: 22px;
+  --stagger-step: 80ms;
+  --stagger-max: 8;
+  --word-step: 90ms;
+  /* Hero entrance ladder. The code card starts at 3.5 steps in, which is why
+     `3.5` is allowed here: it is not a child index, it is a position between
+     the text and the visual. */
+  --hero-enter-base: 0.06s;
+  --hero-enter-step: 0.08s;
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-shift));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--success-glow-strong);
+  }
+
+  50% {
+    box-shadow: 0 0 0 7px var(--success-glow-off);
+  }
+}
+
+/* ---- 1. hero entrance ---- */
+
+/* Delay is `base + step * (index - 1)`, so the ladder is two numbers rather
+   than seven hand-tuned literals.
+
+   The `:nth-child` ladder still has to enumerate positions — CSS cannot count
+   element order on its own, and the alternative is a fifth `style` prop in
+   Hero.tsx. What the default on `.hero-content > *` buys is that an
+   unenumerated child is *not* left at 0s: it waits the same as the last rung.
+   That is what keeps this honest when `openToWork` is false and the label is
+   not rendered, because every child then shifts up one position. */
+.hero-content > * {
+  animation: reveal-rise 0.8s var(--ease) both;
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 6);
+}
+
+.hero-content > *:nth-child(1) {
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 0);
+}
+
+.hero-content > *:nth-child(2) {
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 1);
+}
+
+.hero-content > *:nth-child(3) {
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 2);
+}
+
+.hero-content > *:nth-child(4) {
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 3);
+}
+
+.hero-content > *:nth-child(5) {
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 4);
+}
+
+.hero-content > *:nth-child(6) {
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 5);
+}
+
+.hero-content > *:nth-child(7) {
+  animation-delay: calc(var(--hero-enter-base) + var(--hero-enter-step) * 6);
+}
+
+.hero-visual {
+  animation: reveal-rise 0.9s var(--ease) calc(var(--hero-enter-base) + var(--hero-enter-step) * 3.5) both;
+}
+
+.status-dot {
+  animation: pulse 2.6s var(--ease) infinite;
+}
+
+/* ---- 2. scroll reveal ---- */
+
+/* The reveal moves `translate`, NOT `transform`.
+   `translate` is a separate property that composites with `transform`, so a
+   card can be sliding up into place (translate, 0.7s) and still get its
+   240ms hover lift (transform) without one transition clobbering the other.
+   `transform` is deliberately listed at the fast duration below. */
+.reveal,
+.stagger > * {
+  transition:
+    opacity 0.7s var(--ease),
+    translate 0.7s var(--ease),
+    transform var(--base) var(--ease),
+    border-color var(--base) var(--ease),
+    background-color var(--base) var(--ease),
+    box-shadow var(--base) var(--ease);
+}
+
+.reveal[data-reveal-armed="hidden"] {
+  opacity: 0;
+  translate: 0 var(--reveal-shift);
+}
+
+.stagger[data-reveal-armed="hidden"] > * {
+  opacity: 0;
+  translate: 0 var(--reveal-shift);
+}
+
+/* Delays live only while the element is hidden, so a revealed card's hover
+   responds immediately instead of inheriting a 240ms lag. */
+.stagger[data-reveal-armed="hidden"] > *:nth-child(1) {
+  transition-delay: calc(var(--stagger-step) * 0);
+}
+
+.stagger[data-reveal-armed="hidden"] > *:nth-child(2) {
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+
+.stagger[data-reveal-armed="hidden"] > *:nth-child(3) {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+
+.stagger[data-reveal-armed="hidden"] > *:nth-child(4) {
+  transition-delay: calc(var(--stagger-step) * 3);
+}
+
+.stagger[data-reveal-armed="hidden"] > *:nth-child(5) {
+  transition-delay: calc(var(--stagger-step) * 4);
+}
+
+.stagger[data-reveal-armed="hidden"] > *:nth-child(6) {
+  transition-delay: calc(var(--stagger-step) * 5);
+}
+
+.stagger[data-reveal-armed="hidden"] > *:nth-child(7) {
+  transition-delay: calc(var(--stagger-step) * 6);
+}
+
+.stagger[data-reveal-armed="hidden"] > *:nth-child(n + 8) {
+  transition-delay: calc(var(--stagger-step) * 7);
+}
+
+/* ---- 3. hover polish ---- */
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 3px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--base) var(--ease);
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+.nav-link-active::after {
+  transform: scaleX(1);
+}
+
+/* Same underline as the navbar, sized to the footer links' own box. They are
+   centred on one row with no fixed padding, so the rule has to position itself
+   relative to the link rather than assume the navbar's 14px inset. */
+.footer-nav a {
+  position: relative;
+}
+
+.footer-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform var(--base) var(--ease);
+}
+
+.footer-nav a:hover::after {
+  transform: scaleX(1);
+}
+
+.skill-group,
+.project-card {
+  position: relative;
+}
+
+/* ---- 3. cursor tilt + glow ----
+   `useTilt` writes four custom properties and nothing else. It never touches
+   `transform` itself, which is the point: the tilt, the hover lift and the
+   reveal all need to share one `transform` function chain, and only CSS can
+   compose them without a fight over the property.
+
+   Defaults are declared here so the card looks correct before the first
+   pointermove, and stays correct when the hook bails (touch, reduced motion). */
+.tilt {
+  --tilt-rx: 0deg;
+  --tilt-ry: 0deg;
+  --tilt-lift: 0px;
+  --glow-x: 50%;
+  --glow-y: 0%;
+
+  transform:
+    perspective(1000px)
+    rotateX(var(--tilt-rx))
+    rotateY(var(--tilt-ry))
+    translateY(var(--tilt-lift));
+}
+
+/* Hover is a variable flip, not a transform — so it transitions through the
+   same `transform` the tilt is animating and the two cannot desync. */
+.tilt:hover {
+  --tilt-lift: -5px;
+}
+
+/* The glow tracks the cursor and doubles as the old static hover wash. */
+.tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    460px circle at var(--glow-x) var(--glow-y),
+    var(--accent-dim),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity var(--base) var(--ease);
+  pointer-events: none;
+}
+
+.tilt:hover::after {
+  opacity: 1;
+}
+
+.tilt:hover {
+  border-color: var(--border-strong);
+}
+
+.tilt:hover {
+  box-shadow: var(--card-shadow);
+}
+
+/* Accent bar that wipes down the left edge on hover. Drawn with a scaleY on a
+   pseudo-element rather than a padding change, so hovering causes no reflow. */
+.project-card::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  bottom: 40px;
+  left: 0;
+  width: 2px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(to bottom, var(--accent), var(--accent-bright));
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform var(--base) var(--ease);
+}
+
+.project-card:hover::before {
+  transform: scaleY(1);
+}
+
+.project-links a:hover .icon {
+  transform: translate(1px, -1px);
+}
+
+.project-links .icon {
+  transition: transform var(--fast) var(--ease);
+}
+
+.social-link:hover .icon {
+  transform: scale(1.12);
+}
+
+.social-link .icon {
+  transition: transform var(--fast) var(--ease);
+}
+
+.timeline-item {
+  transition: opacity var(--base) var(--ease);
+}
+
+.timeline-item:hover .timeline-marker {
+  transform: scale(1.25);
+  background: var(--accent-bright);
+}
+
+.timeline-marker {
+  transition:
+    transform var(--base) var(--ease),
+    background-color var(--base) var(--ease);
+}
+
+/* ---- 4. skill meters ---- */
+/* Base state is *filled*, and only collapses when the parent group is armed.
+   That inversion is deliberate: a meter that defaults to empty and fills on
+   reveal shows an empty bar to anyone whose JS never runs. */
+.skill-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.skill-level {
+  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.skill-meter {
+  display: block;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--meter-track);
+  overflow: hidden;
+}
+
+.skill-meter-fill {
+  display: block;
+  width: var(--level, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  transform: scaleX(1);
+  transform-origin: left;
+  /* Slightly behind the card's own reveal, so the bar finishes filling just
+     after the panel it belongs to has settled. */
+  transition: transform 0.9s var(--ease) 0.18s;
+}
+
+.stagger[data-reveal-armed="hidden"] .skill-meter-fill {
+  transform: scaleX(0);
+}
+
+.skill-group:hover .skill-meter {
+  background: var(--meter-track-hover);
+}
+
+/* ---- 5. count-up stats ---- */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 52px;
+}
+
+.stat {
+  padding: 24px 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  /* Without this the number jitters its own width while counting. */
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-suffix {
+  color: var(--accent-bright);
+  font-size: 0.6em;
+}
+
+.stat-label {
+  display: block;
+  margin-top: 8px;
+  color: var(--text-subtle);
+  font-size: 0.85rem;
+}
+
+/* ---- 6. aurora background ---- */
+/* Fixed, behind everything, and never interactive. `z-index: -1` paints it
+   above the root canvas background but below in-flow content, which is exactly
+   what an ambient backdrop wants. */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: var(--aurora-a);
+  will-change: transform;
+}
+
+.aurora-blob-a {
+  top: -18vh;
+  left: -8vw;
+  width: 52vw;
+  height: 52vh;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 68%);
+  opacity: var(--aurora-a);
+  animation: aurora-drift-a 34s ease-in-out infinite alternate;
+}
+
+.aurora-blob-b {
+  top: 24vh;
+  right: -14vw;
+  width: 58vw;
+  height: 58vh;
+  background: radial-gradient(circle, var(--aurora-teal) 0%, transparent 66%);
+  opacity: var(--aurora-b);
+  animation: aurora-drift-b 46s ease-in-out infinite alternate;
+}
+
+.aurora-blob-c {
+  bottom: -22vh;
+  left: 22vw;
+  width: 62vw;
+  height: 62vh;
+  background: radial-gradient(circle, var(--aurora-violet) 0%, transparent 68%);
+  opacity: var(--aurora-c);
+  animation: aurora-drift-c 58s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(9vw, 7vh, 0) scale(1.16);
+  }
+}
+
+@keyframes aurora-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+
+  to {
+    transform: translate3d(-11vw, 10vh, 0) scale(1);
+  }
+}
+
+@keyframes aurora-drift-c {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(7vw, -9vh, 0) scale(1.2);
+  }
+}
+
+/* ---- starfield ---- */
+/* Gradient tiles rather than a few hundred spans: one element paints a whole
+   field. Four layers, because four is what it takes to look like individual
+   stars blinking and travelling rather than one group pulsing in unison — each
+   layer carries its own period, and the eye reads the desync as randomness.
+   Per-star timing would need one element per star, which is the thing this
+   effect exists to avoid.
+
+   The four tile sizes are coprime-ish and drift on different periods and phases,
+   so the composite pattern does not repeat on any axis a viewer can follow.
+   Density is ~1 star per 4,600px², which measures out at roughly 280 stars on a
+   1440×900 viewport — sparse enough to read as sky, dense enough to notice.
+
+   `inset: -20%` is the drift budget: the tile repeats infinitely, so a layer can
+   slide as far as the overscan without an edge ever entering the viewport. The
+   orbit radii below are percentages of that box, which is what keeps them inside
+   the budget at every viewport size — fixed pixels ran out of margin on short
+   phone viewports and dragged the element's own edge into view.
+
+   Drift is on `translate`, blinking is on `opacity`. Separate properties, they
+   compose, and nothing else animates these elements. */
+.starfield {
+  --drift-x: 9%;
+  --drift-y: 6%;
+  position: absolute;
+  inset: -20%;
+  display: block;
+  background-image:
+    radial-gradient(1.3px 1.3px at 18px 26px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.1px 1.1px at 86px 54px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 150px 18px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 244px 72px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 300px 140px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1px 1px at 44px 168px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 120px 214px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 206px 180px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 282px 262px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.1px 1.1px at 160px 300px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.1px 1.1px at 62px 110px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 196px 96px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 256px 196px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 96px 268px, var(--star-red) 50%, transparent 51%);
+  background-size: var(--star-tile) var(--star-tile);
+  background-position: var(--star-shift-x) var(--star-shift-y);
+  opacity: var(--star-opacity);
+  will-change: translate;
+  /* Negative delay starts the layer mid-path, so the four layers are never at the
+     same point in their cycle and the field never visibly pulses. */
+  animation: star-drift-orbit 78s linear -18s infinite;
+}
+
+/* Blink group A, drifting on a wider, slower orbit than the base layer and
+   squashed the other way. The mismatched tile also breaks the base layer's
+   repeat, so this one is doing two jobs. */
+.starfield::before {
+  --drift-x: 6%;
+  --drift-y: 9%;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 60px 90px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 250px 40px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 410px 150px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 140px 300px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 330px 340px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 30px 410px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.1px 1.1px at 250px 440px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 180px 190px, var(--star-red) 50%, transparent 51%),
+    radial-gradient(1.1px 1.1px at 400px 270px, var(--star-bright) 50%, transparent 51%);
+  background-size: calc(var(--star-tile) * 1.46875) calc(var(--star-tile) * 1.46875);
+  background-position: var(--star-shift-x) var(--star-shift-y);
+  will-change: translate, opacity;
+  animation:
+    star-drift-orbit 112s linear -47s infinite,
+    star-blink-a 4.3s ease-in-out infinite;
+}
+
+/* Blink group B, on a third period and the tightest orbit of the three, so it
+   never lines up with the base layer. */
+.starfield::after {
+  --drift-x: 8%;
+  --drift-y: 7%;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.7px 1.7px at 120px 80px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 420px 60px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 300px 240px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 560px 200px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 80px 380px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 400px 470px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 200px 560px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 520px 580px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 240px 150px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 480px 340px, var(--star-bright) 50%, transparent 51%);
+  background-size: calc(var(--star-tile) * 1.90625) calc(var(--star-tile) * 1.90625);
+  background-position: var(--star-shift-x) var(--star-shift-y);
+  will-change: translate, opacity;
+  animation:
+    star-drift-orbit 58s linear -11s infinite,
+    star-blink-b 6.7s ease-in-out infinite;
+}
+
+/* ---- the near field ---- */
+/* A fourth sheet, so the field has depth as well as variety. This one orbits
+   fastest and carries the smallest, dimmest dots, which the eye reads as the
+   layer nearest the viewer — differential motion across layers is what sells a
+   sky with depth rather than one sheet sliding sideways.
+
+   Still no per-star elements: one more composited `translate`, no repaint. */
+.starfield-near {
+  --drift-x: 5%;
+  --drift-y: 8%;
+  position: absolute;
+  inset: -20%;
+  display: block;
+  background-image:
+    radial-gradient(1px 1px at 34px 62px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(0.9px 0.9px at 188px 24px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1.1px 1.1px at 352px 128px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(0.9px 0.9px at 96px 296px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1px 1px at 470px 250px, var(--star-bright) 50%, transparent 51%),
+    radial-gradient(0.9px 0.9px at 268px 402px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(0.9px 0.9px at 600px 120px, var(--star-blue) 50%, transparent 51%),
+    radial-gradient(1px 1px at 610px 520px, var(--star-bright) 50%, transparent 51%);
+  background-size:
+    calc(var(--star-tile) * 2.5625) calc(var(--star-tile) * 2.5625);
+  opacity: calc(var(--star-opacity) * 0.72);
+  will-change: translate;
+  animation: star-drift-orbit 40s linear -26s infinite;
+}
+
+/* No stars behind the navbar, on any layer. Measured, not guessed: a 1px star
+   landing on a glyph pixel drops that pixel to 2.4:1 against the navbar's
+   translucent background, because 0.85 alpha still lets 15% of a bright dot
+   through. Six such pixels sat in the logo's 30×36 box. The band is empty of
+   stars anyway as far as anyone can tell, so the mask costs nothing visible.
+
+   One selector list rather than a mask per layer, because the stop below is only
+   correct while every layer shares the same inset — duplicated, it would drift
+   out of sync the first time one of them changed.
+
+   14.2857% is not arbitrary: these layers are `inset: -20%`, so each is 140% of
+   the viewport tall and starts 20% of the viewport above it. The top of the
+   viewport therefore sits at 20/140 = 14.2857% of the element's own height, and
+   a `to bottom` mask gradient resolves its stops against that same height.
+   Change the inset and this number has to change with it. */
+.starfield,
+.starfield-near {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 14.2857%,
+    #000 calc(14.2857% + var(--nav-height)),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 14.2857%,
+    #000 calc(14.2857% + var(--nav-height)),
+    #000 100%
+  );
+}
+
+/* ---- the web ---- */
+/* Two repeating gradients on one element: a conic sweep for the sixteen spokes
+   and a radial one for the rings, which between them are the whole pattern — no
+   SVG, no extra elements. The halftone is a third layer, confined to the same
+   corner by the same mask, because a dot grid across the full viewport sits
+   directly under the body copy and eats its contrast.
+
+   The mask does the work of an edge fade: it dissolves the web outward from the
+   corner so the element never ends on a hard circle. */
+.spider-web {
+  position: absolute;
+  top: -16vmin;
+  right: -16vmin;
+  width: 62vmin;
+  height: 62vmin;
+  background-image:
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      var(--web-line) 0deg 0.35deg,
+      transparent 0.35deg 22.5deg
+    ),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      var(--web-line) 0 1px,
+      transparent 1px 24px
+    ),
+    radial-gradient(circle, var(--web-line) 0.9px, transparent 1.3px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    12px 12px;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 24%, transparent 68%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 24%, transparent 68%);
+  opacity: var(--web-opacity);
+  will-change: translate, rotate, opacity;
+  animation:
+    web-drift 46s ease-in-out infinite alternate,
+    web-pulse 8.5s ease-in-out infinite alternate;
+}
+
+/* The spider-sense rings: one ring expanding out of the corner, over and over.
+   It inherits the parent's mask, so it is already faded at its outer edge and
+   needs no second one. `scale` and `opacity` only — the parent animates
+   `translate`/`rotate`, so parent and child never fight over one property. */
+.spider-web::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 44%,
+    var(--web-line) 46%,
+    transparent 49%
+  );
+  opacity: 0;
+  will-change: scale, opacity;
+  animation: spider-sense 14s var(--ease) infinite;
+}
+
+/* A slow breathe rather than a spin: a rotating web reads as a loading spinner,
+   which is not what a corner decoration should be saying. */
+@keyframes web-drift {
+  from {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+
+  to {
+    translate: -2vmin 1.5vmin;
+    rotate: 1.6deg;
+  }
+}
+
+/* Kept relative to the token rather than to fixed numbers, so retuning
+   `--web-opacity` in one theme cannot leave the other theme breathing around a
+   value it never had. */
+@keyframes web-pulse {
+  from {
+    opacity: calc(var(--web-opacity) * 0.7);
+  }
+
+  to {
+    opacity: var(--web-opacity);
+  }
+}
+
+@keyframes spider-sense {
+  0%,
+  8% {
+    scale: 0.18;
+    opacity: 0;
+  }
+
+  22% {
+    opacity: calc(var(--web-opacity) * 1.6);
+  }
+
+  60%,
+  100% {
+    scale: 1.5;
+    opacity: 0;
+  }
+}
+
+/* The streaks. Real elements rather than more background layers: a shooting star
+   has to cross the whole viewport, which a tile-repeating layer cannot do. Two
+   of them, on different diagonals and different periods, so the sky is never
+   empty for long and they never arrive together. Most of each cycle is spent
+   parked off-screen at opacity 0 — the pass is the last ~1.5s, and that
+   compression is what makes it read as a meteor rather than a slow-moving object.
+   The base class holds only what both share, so the reduced-motion rule can name
+   one selector. */
+.shooting-star {
+  position: absolute;
+  left: 0;
+  width: 150px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, transparent, var(--star-blue) 45%, var(--star-red));
+  opacity: 0;
+  will-change: translate, opacity;
+}
+
+/* Falls left-to-right. */
+.shooting-star-a {
+  top: 8vh;
+  rotate: 16deg;
+  animation: shooting-star 11s var(--ease) infinite;
+}
+
+/* Falls right-to-left on the opposite diagonal, a little shorter and dimmer so
+   the two are not interchangeable. The 22s period is not arbitrary: 11s and 17s
+   beat against each other and fire within 0.2s of each other every ~40s, whereas
+   22s keeps the smallest gap between the two passes above 5s for the first ten
+   minutes of a session. */
+.shooting-star-b {
+  top: 52vh;
+  width: 120px;
+  rotate: 164deg;
+  animation: shooting-star-b 22s var(--ease) infinite;
+}
+
+/* One orbit, shared by all four layers, sized per layer by `--drift-x` /
+   `--drift-y`. Custom properties resolve against the element being animated, so
+   a single keyframe set gives each layer its own ellipse.
+
+   The path is CLOSED and the timing is `linear`, which is the whole fix for the
+   stutter this effect had. The two obvious alternatives both have a visible
+   seam, and both were shipped here first:
+
+     - `alternate`, going out and back: velocity reverses instantly at the
+       turnaround, so the whole field jerks.
+     - `ease-in-out`, to soften that jerk: every layer decelerates to a dead stop
+       at each end and accelerates out again, which reads as the sky stuttering
+       rather than as stars moving.
+
+   A closed loop has neither. Constant velocity, so there is no beat to notice;
+   and because the path returns to `0 0` at 100%, the restart lands on exactly
+   the state the cycle began in and is invisible. That also makes it independent
+   of tile size — the alternative, looping by translating exactly one tile, would
+   have needed an 820px overscan for the largest layer and quadrupled the painted
+   area.
+
+   Twelve stops at 30° intervals: cos/sin of the angle, scaled by the radii.
+   Fewer stops and the ellipse visibly becomes a polygon — at twelve the radial
+   error is under 4%, below what a drifting dot resolves. */
+@keyframes star-drift-orbit {
+  0% {
+    translate: var(--drift-x) 0;
+  }
+
+  8.333% {
+    translate: calc(var(--drift-x) * 0.866) calc(var(--drift-y) * 0.5);
+  }
+
+  16.667% {
+    translate: calc(var(--drift-x) * 0.5) calc(var(--drift-y) * 0.866);
+  }
+
+  25% {
+    translate: 0 var(--drift-y);
+  }
+
+  33.333% {
+    translate: calc(var(--drift-x) * -0.5) calc(var(--drift-y) * 0.866);
+  }
+
+  41.667% {
+    translate: calc(var(--drift-x) * -0.866) calc(var(--drift-y) * 0.5);
+  }
+
+  50% {
+    translate: calc(var(--drift-x) * -1) 0;
+  }
+
+  58.333% {
+    translate: calc(var(--drift-x) * -0.866) calc(var(--drift-y) * -0.5);
+  }
+
+  66.667% {
+    translate: calc(var(--drift-x) * -0.5) calc(var(--drift-y) * -0.866);
+  }
+
+  75% {
+    translate: 0 calc(var(--drift-y) * -1);
+  }
+
+  83.333% {
+    translate: calc(var(--drift-x) * 0.5) calc(var(--drift-y) * -0.866);
+  }
+
+  91.667% {
+    translate: calc(var(--drift-x) * 0.866) calc(var(--drift-y) * -0.5);
+  }
+
+  100% {
+    translate: var(--drift-x) 0;
+  }
+}
+
+/* Long dark phases with a quick peak, not a sine wave: a star that breathes
+   evenly looks like a pulsing dot, one that is mostly out and briefly flares
+   looks like a star. */
+@keyframes star-blink-a {
+  0%,
+  62%,
+  100% {
+    opacity: 0.12;
+  }
+
+  74% {
+    opacity: 1;
+  }
+}
+
+@keyframes star-blink-b {
+  0%,
+  48%,
+  100% {
+    opacity: 0.18;
+  }
+
+  62% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes shooting-star {
+  0%,
+  74% {
+    translate: -20vw 0;
+    opacity: 0;
+  }
+
+  76% {
+    opacity: 0.85;
+  }
+
+  90% {
+    translate: 120vw 52vh;
+    opacity: 0;
+  }
+
+  100% {
+    translate: 120vw 52vh;
+    opacity: 0;
+  }
+}
+
+/* Same shape of keyframes as `-a`, mirrored, and parked for longer so it crosses
+   about 5s away from `-a`'s pass rather than alongside it. The crossing itself is
+   ~2s in both, because the percentages are scaled to the period, not copied. */
+@keyframes shooting-star-b {
+  0%,
+  62% {
+    translate: 120vw 0;
+    opacity: 0;
+  }
+
+  63.5% {
+    opacity: 0.7;
+  }
+
+  71% {
+    translate: -10vw 46vh;
+    opacity: 0;
+  }
+
+  100% {
+    translate: -10vw 46vh;
+    opacity: 0;
+  }
+}
+
+/* ---- 7. hero parallax ---- */
+/* Drift goes on `translate`, fade on `opacity`, both driven by values
+   `useParallax` writes. Deliberately NOT on `transform`: the hero children
+   already run a filled entrance animation over `transform`, and a filled
+   animation beats any inline transform forever. */
+.hero-content {
+  translate: 0 var(--parallax-y, 0px);
+  opacity: calc(1 - var(--parallax-fade, 0) * 0.75);
+}
+
+.hero-visual {
+  translate: 0 var(--parallax-y, 0px);
+}
+
+/* `.hero-visual` itself holds a filled opacity animation, so its child fades
+   instead. The custom property inherits down to it, and the glow is a descendant
+   of that child, so one rule fades the portrait and its glow together. */
+.hero-portrait {
+  opacity: calc(1 - var(--parallax-fade, 0) * 0.75);
+}
+
+/* ---- 8. word-by-word headline ---- */
+/* Runs on load with no observer and no JS: a plain animation whose delay comes
+   from `--i`, which `Words` sets per word. Above the fold, so gating it behind
+   IntersectionObserver would mean a special case. */
+.word {
+  display: inline-block;
+  animation: word-rise 0.7s var(--ease) both;
+  animation-delay: calc(var(--word-delay, 0ms) + var(--i, 0) * var(--word-step));
+}
+
+@keyframes word-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.5em;
+    filter: blur(6px);
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+
+/* ---- 9. (removed: name shimmer) ---- */
+/* Group 9 used to hold the shimmer that swept a gradient across the name. The
+   name is a flat `color` now — see `.hero-name` in the HERO block — so there is
+   no background to slide and nothing left for this group to do. It is not
+   renumbered: the numbers are a stable index into this file, and a gap that
+   says "this used to be here" beats silently shifting every group below it.
+
+   If the name ever gets a gradient back, it goes back here — and it has to be
+   the ONLY rule that sets `background` on that element, which is the bug this
+   group used to cause. */
+
+/* No `@supports (background-clip: text)` fallback any more, and that is the
+   point: the name is a flat `color`, so there is no `background-clip` to
+   support and no `color: transparent` for a fallback to fail to undo. */
+
+/* ---- 10. magnetic buttons ---- */
+/* `useMagnetic` writes the pull; CSS composes it with the hover lift that
+   `.btn-primary:hover` already sets. Both live in one `transform` chain. */
+.magnetic {
+  translate: var(--magnetic-x, 0px) var(--magnetic-y, 0px);
+  transition:
+    translate var(--base) var(--ease),
+    transform var(--base) var(--ease);
+}
+
+/* ---- 11. tech marquee ---- */
+.hero-marquee {
+  position: relative;
+  margin-top: 34px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.hero-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-slide calc(var(--marquee-count, 6) * 3.4s) linear infinite;
+}
+
+/* Two identical lists side by side; sliding exactly one of them reads as
+   seamless because the second copy starts where the first one would. */
+.hero-marquee-track .hero-tech {
+  flex: none;
+}
+
+@keyframes marquee-slide {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ---- 12. copy-email button ---- */
+.copy-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.copy-email:hover {
+  border-color: var(--accent);
+  background: var(--surface-hover);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.copy-email-icon {
+  position: relative;
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.copy-email .icon {
+  position: absolute;
+  inset: 0;
+  width: 16px;
+  height: 16px;
+  transition:
+    opacity var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+/* Idle: only the envelope. Copied: envelope out, check in. */
+.copy-icon-mail {
+  opacity: 1;
+  transform: none;
+}
+
+.copy-icon-check,
+.copy-icon-fail {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.copy-email[data-status="copied"] .copy-icon-mail,
+.copy-email[data-status="failed"] .copy-icon-mail {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.copy-email[data-status="copied"] .copy-icon-check,
+.copy-email[data-status="failed"] .copy-icon-fail {
+  opacity: 1;
+  transform: none;
+}
+
+.copy-email[data-status="copied"] {
+  color: var(--success);
+}
+
+/* ---- backdrop variants ---- */
+/* Which set the aurora paints is one attribute on the element, set from
+   `src/data/backdrop.ts`. Not dead CSS: each of these values is reachable from
+   that file, which is also the list to read before editing anything here.
+
+   Every variant only redeclares tokens or hides a layer. No rule above is
+   duplicated per variant, which is the point — the alternative is four copies of
+   the starfield drifting out of sync with each other.
+
+   `spiderman` needs nothing here: it is the set `:root` already declares, so an
+   absent or misspelt attribute still lands on it rather than on an unstyled
+   backdrop. */
+.aurora[data-backdrop="classic"] {
+  --star-red: #ffd9de;
+  --star-blue: #cfe0ff;
+  --star-bright: #ffffff;
+}
+
+/* The web is part of the Spider-Man motif, so `classic` drops it. The streaks
+   stay: they read as meteors in any palette. */
+.aurora[data-backdrop="classic"] .spider-web {
+  display: none;
+}
+
+/* Web only: the corner web and its three animations, nothing else. */
+.aurora[data-backdrop="web-only"] .starfield,
+.aurora[data-backdrop="web-only"] .shooting-star {
+  display: none;
+}
+
+/* Kill switch: no field, no web, no streaks, no blobs. `display: none` on the
+   children rather than unmounting them in JSX, so switching variants stays a
+   data change and the markup is identical across all four. */
+.aurora[data-backdrop="none"] > * {
+  display: none;
+}
+
+
+.copy-email[data-status="failed"] {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ---- 13. reduced motion ---- */
+/* The JS hooks already disable themselves for these users, so this block is
+   belt-and-braces: it also covers the case where a hook was added without its
+   media query, and it neutralises anything the transitions would still do. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-content > *,
+  .hero-visual,
+  .status-dot,
+  .aurora-blob,
+  .spider-web,
+  .spider-web::after,
+  .starfield,
+  .starfield::before,
+  .starfield::after,
+  .starfield-near,
+  .shooting-star,
+  .word {
+    animation: none !important;
+  }
+
+  .hero-marquee-track {
+    animation: none !important;
+  }
+
+  .reveal,
+  .stagger > * {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .scroll-progress {
+    display: none;
+  }
+
+  .skill-meter-fill {
+    transition: none !important;
+  }
+
+  .hero-content,
+  .hero-visual {
+    translate: none !important;
+  }
+
+  .hero-content,
+  .hero-portrait {
+    opacity: 1 !important;
+  }
+
+  .tilt,
+  .magnetic {
+    transform: none !important;
+    translate: none !important;
+  }
+
+  .tilt:hover {
+    --tilt-lift: 0px !important;
+  }
+
+  .tilt::after {
+    display: none;
+  }
+}
+
+
