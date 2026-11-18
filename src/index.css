@@ -46,7 +46,7 @@
   --container: 1160px;
   --gutter: 24px;
   --nav-height: 72px;
-  --radius-sm: 8px;
+  --radius-sm: 15px;
   --radius: 12px;
   --radius-lg: 18px;
   --radius-pill: 999px;
@@ -1064,7 +1064,7 @@ a {
 
 .now-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 16px;
 }
 
@@ -1135,7 +1135,7 @@ a {
 
 .recognition-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 16px;
 }
 
@@ -1208,7 +1208,7 @@ a.recognition-link:focus-visible {
 
 .skills-groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 20px;
 }
 
@@ -1885,6 +1885,18 @@ a.recognition-link:focus-visible {
     padding-block: 60px;
   }
 
+  .hero {
+    gap: 44px;
+  }
+
+  .hero-actions {
+    gap: 10px;
+  }
+
+  .hero-marquee {
+    margin-top: 32px;
+  }
+
   .hero h1 {
     font-size: clamp(2.1rem, 11vw, 3rem);
   }
@@ -1894,6 +1906,14 @@ a.recognition-link:focus-visible {
   }
 
   .skills-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .now-list {
+    grid-template-columns: 1fr;
+  }
+
+  .recognition-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2960,7 +2980,15 @@ a.recognition-link:focus-visible {
 /* Drift goes on `translate`, fade on `opacity`, both driven by values
    `useParallax` writes. Deliberately NOT on `transform`: the hero children
    already run a filled entrance animation over `transform`, and a filled
-   animation beats any inline transform forever. */
+   animation beats any inline transform forever.
+
+   Both layers read the same two properties, and `useParallax` writes them per
+   layer, so `.hero-content` and `.hero-visual` each resolve to their own
+   values — `speed` is the only thing that differs between them.
+
+   The `0.75` is the floor of the fade: at full exit the hero is still 25%
+   opaque rather than gone. Nothing ever has to un-hide it, because these two
+   elements stop being painted the moment they leave the viewport anyway. */
 .hero-content {
   translate: 0 var(--parallax-y, 0px);
   opacity: calc(1 - var(--parallax-fade, 0) * 0.75);
