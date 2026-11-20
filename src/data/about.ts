@@ -1,94 +1,106 @@
-import { profile } from "./profile"
-import { projects } from "./projects"
-import { skills } from "./skills"
+import { profile } from "./profile";
+import { projects } from "./projects";
+import { skills } from "./skills";
 
 export interface AboutFact {
-    id: string
-    label: string
-    value: string
+  id: string;
+  label: string;
+  value: string;
 }
 
-/** A figure that counts up when the section scrolls into view. */
 export interface AboutStat {
-    id: string
-    label: string
-    /** The real number. Rendered server-side, so this must be the true value. */
-    value: number
-    /** Appended after the number, e.g. "+" or "k". Not animated. */
-    suffix?: string
+  id: string;
+  label: string;
+  value: number;
+  suffix?: string;
 }
+
+/* ===================================
+   ABOUT SECTION CONTENT
+=================================== */
 
 export const aboutCopy = {
-    label: "ABOUT",
-    title: "A backend engineer who ships the whole thing",
-    lead: "Most of my work is on the server, but I would rather build the interface too than hand it off and argue about the error shape.",
-}
+  label: "ABOUT ME",
+
+  title: "Backend Developer Building End-to-End Web Applications",
+
+  lead: "I focus on developing reliable backend systems, designing RESTful APIs, and building practical web applications that solve real-world problems.",
+};
+
+/* ===================================
+   PERSONAL & TECHNICAL INFORMATION
+=================================== */
 
 export const aboutFacts: AboutFact[] = [
-    {
-        id: "location",
-        label: "Based in",
-        value: profile.location,
-    },
-    {
-        id: "focus",
-        label: "Focus",
-        value: "API design, data modelling, authentication",
-    },
-    {
-        id: "learning",
-        label: "Currently learning",
-        value: "Deeper TypeScript and query tuning",
-    },
-    {
-        id: "status",
-        label: "Status",
-        value: profile.openToWork ? "Open to new work" : "Not looking right now",
-    },
-]
+  {
+    id: "location",
+    label: "Based in",
+    value: profile.location,
+  },
+  {
+    id: "focus",
+    label: "Specialization",
+    value:
+      "RESTful APIs, database design, authentication, and backend development",
+  },
+  {
+    id: "learning",
+    label: "Currently improving",
+    value:
+      "Backend architecture, TypeScript, testing, and database optimization",
+  },
+  {
+    id: "status",
+    label: "Availability",
+    value: profile.openToWork
+      ? "Open to internships and junior developer opportunities"
+      : "Not currently seeking opportunities",
+  },
+];
+
+/* ===================================
+   DEVELOPMENT PRINCIPLES
+=================================== */
 
 export const aboutPrinciples: AboutFact[] = [
-    {
-        id: "schema-first",
-        label: "Schema first",
-        value: "Get the relationships right before a single endpoint exists.",
-    },
-    {
-        id: "boring-code",
-        label: "Boring code",
-        value: "Explicit error handling beats clever abstraction every time.",
-    },
-    {
-        id: "ship-it",
-        label: "Ship it",
-        value: "An imperfect feature in production teaches more than a perfect one in a branch.",
-    },
-]
+  {
+    id: "schema-first",
+    label: "Schema First",
+    value: "I design clear database relationships before building APIs.",
+  },
+  {
+    id: "boring-code",
+    label: "Reliable by Design",
+    value:
+      "I prioritize validation, secure authentication, clear error handling, and maintainable code.",
+  },
+  {
+    id: "ship-it",
+    label: "Build, Test & Improve",
+    value:
+      "I build practical applications and continuously improve them through testing, feedback, and hands-on experience.",
+  },
+];
 
-/**
- * Counted-up figures above the narrative. These are the numbers a visitor
- * skims for, so keep them to three and keep them defensible.
- *
- * `aboutStats` is derived from `skills` and `projects` where it can be, so it
- * cannot drift out of sync with the rest of the page. Only the one genuinely
- * unmeasurable figure — years of experience — is hand-written.
- */
+/* ===================================
+   ABOUT STATISTICS
+=================================== */
+
 export const aboutStats: AboutStat[] = [
-    {
-        id: "years",
-        label: "Years writing code",
-        /* <-- REPLACE with your real figure. */
-        value: 4,
-        suffix: "+",
-    },
-    {
-        id: "technologies",
-        label: "Technologies in daily use",
-        value: skills.length,
-    },
-    {
-        id: "projects",
-        label: "Projects worth writing up",
-        value: projects.length,
-    },
-]
+  {
+    id: "years",
+    label: "Years of Coding",
+    value: 3,
+    suffix: "+",
+  },
+  {
+    id: "technologies",
+    label: "Technologies Explored",
+    value: skills.length,
+  },
+  {
+    id: "projects",
+    label: "Featured Projects",
+    value: projects.length,
+  },
+];

@@ -1,81 +1,107 @@
 import {
-    recognitionCopy,
-    recognitionItems,
-    type RecognitionItem,
-    type RecognitionKind,
-} from "../data/recognition"
-import Reveal from "./Reveal"
-import SectionHeading from "./SectionHeading"
+  recognitionCopy,
+  recognitionItems,
+  type RecognitionItem,
+  type RecognitionKind,
+} from "../data/recognition";
+
+import Icon from "./Icon";
+import Reveal from "./Reveal";
+import SectionHeading from "./SectionHeading";
 
 const KIND_LABEL: Record<RecognitionKind, string> = {
-    course: "Course",
-    certificate: "Certificate",
-    community: "Community",
-    award: "Award",
-}
+  course: "Course",
+  certificate: "Certificate",
+  community: "Community",
+  award: "Award",
+  internship: "Internship",
+};
 
 interface RecognitionCardProps {
-    item: RecognitionItem
+  item: RecognitionItem;
 }
 
 function RecognitionCard({ item }: RecognitionCardProps) {
-    const label = KIND_LABEL[item.kind]
+  const label = KIND_LABEL[item.kind];
 
-    const body = (
-        <>
-            <div className="recognition-top">
-                <span className="recognition-kind">{label}</span>
-                {item.meta && <span className="recognition-meta">{item.meta}</span>}
-            </div>
+  const isExternal = Boolean(item.href && /^https?:\/\//i.test(item.href));
 
-            <h3>{item.title}</h3>
-            <span className="recognition-issuer">{item.issuer}</span>
-            <p>{item.detail}</p>
-        </>
-    )
+  const viewLabel =
+    item.kind === "internship"
+      ? "View Internship Leter"
+      : item.kind === "certificate"
+        ? "View Certificate"
+        : "View Training Document";
 
-    return (
-        <li className="recognition-card">
-            {/* One <a> wrapping the whole card keeps it a single tab stop. A card
-                with a nested link plus a heading link would double every entry
-                in the tab order. */}
-            {item.href ? (
-                <a
-                    className="recognition-link"
-                    href={item.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`${item.title} — ${item.issuer}`}
-                >
-                    {body}
-                </a>
-            ) : (
-                <div className="recognition-link">{body}</div>
-            )}
-        </li>
-    )
+  const body = (
+    <>
+      <div className="recognition-top">
+        <span className="recognition-kind">{label}</span>
+
+        {item.meta && <span className="recognition-meta">{item.meta}</span>}
+      </div>
+
+      <h3>{item.title}</h3>
+
+      <span className="recognition-issuer">{item.issuer}</span>
+
+      <p>{item.detail}</p>
+
+      {/* Visual button inside the existing card link */}
+      {item.href && (
+        <span className="recognition-view-btn" aria-hidden="true">
+          <span>{viewLabel}</span>
+          <Icon name="external" />
+        </span>
+      )}
+    </>
+  );
+
+  return (
+    <li className="recognition-card">
+      {item.href ? (
+        <a
+          className="recognition-link"
+          href={item.href}
+          target={
+            isExternal || item.href.startsWith("/") ? "_blank" : undefined
+          }
+          rel="noopener noreferrer"
+          aria-label={`${viewLabel}: ${item.title} — ${item.issuer}`}
+        >
+          {body}
+        </a>
+      ) : (
+        <div className="recognition-link">{body}</div>
+      )}
+    </li>
+  );
 }
 
 function Recognition() {
-    return (
-        <section id="recognition" className="section recognition">
-            <Reveal>
-                <SectionHeading
-                    label={recognitionCopy.label}
-                    title={recognitionCopy.title}
-                    body={recognitionCopy.body}
-                />
-            </Reveal>
+  return (
+    <section id="recognition" className="section recognition">
+      <Reveal>
+        <SectionHeading
+          label={recognitionCopy.label}
+          title={recognitionCopy.title}
+          body={recognitionCopy.body}
+        />
+      </Reveal>
 
-            {/* `as="ul"` is load-bearing: the default div wrapper would strip
-                the list semantics off the li children. */}
-            <Reveal stagger as="ul" className="recognition-grid">
-                {recognitionItems.map((item) => (
-                    <RecognitionCard key={item.id} item={item} />
-                ))}
-            </Reveal>
-        </section>
-    )
+      <Reveal
+        stagger
+        as="ul"
+        className={`recognition-grid ${
+          recognitionItems.length === 1 ? "recognition-grid--single" : ""
+        }`}
+      >
+        {recognitionItems.map((item) => (
+          <RecognitionCard key={item.id} item={item} />
+        ))}
+      </Reveal>
+    </section>
+  );
 }
 
-export default Recognition
+export default Recognition;

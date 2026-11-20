@@ -1,52 +1,89 @@
-export type NowKind = "building" | "learning" | "reading"
+export type NowKind = "building" | "learning" | "reading";
 
 export interface NowItem {
-    id: string
-    kind: NowKind
-    /** The thing itself, kept short enough to read in one line. */
-    title: string
-    /** One sentence on why it holds my attention. */
-    detail: string
-    /** Optional link out — a repo, a doc, a talk. */
-    href?: string
-    hrefLabel?: string
-}
-
-export const nowCopy = {
-    label: "NOW",
-    title: "What I am in the middle of",
-    body: "Short-lived by design. This is what my attention is actually on this month, rather than a claim about everything I have ever done.",
+  id: string;
+  kind: NowKind;
+  title: string;
+  detail: string;
+  href?: string;
+  hrefLabel?: string;
 }
 
 /**
- * <-- REPLACE all of this. It goes stale fast, which is the point: a "currently"
- * section that quietly stops being true is worse than no section at all.
+ * Current activities displayed on the portfolio.
+ *
+ * Keep this section updated to reflect
+ * real projects and ongoing learning.
  */
+
+export const nowCopy = {
+  label: "CURRENT FOCUS",
+
+  title: "What I'm Working On",
+
+  body: "A snapshot of the projects I'm building, technologies I'm exploring, and skills I'm improving as I grow as a backend developer.",
+};
+
 export const nowItems: NowItem[] = [
-    {
-        id: "now-portfolio",
-        kind: "building",
-        title: "This site",
-        detail: "Rebuilding my portfolio from scratch to get the TypeScript strictness right.",
-        href: "https://github.com/your-handle",
-        hrefLabel: "Source",
-    },
-    {
-        id: "now-typescript",
-        kind: "learning",
-        title: "TypeScript generics",
-        detail: "Conditional types and inference, mostly by rewriting code that already worked.",
-    },
-    {
-        id: "now-query-tuning",
-        kind: "learning",
-        title: "Postgres query plans",
-        detail: "Reading EXPLAIN output properly instead of guessing at indexes.",
-    },
-    {
-        id: "now-reading",
-        kind: "reading",
-        title: "Designing Data-Intensive Applications",
-        detail: "Back to the consistency chapter with a database schema in mind this time.",
-    },
-]
+  // ==========================================
+  // CURRENT PROJECTS
+  // ==========================================
+
+  {
+    id: "now-portfolio",
+    kind: "building",
+    title: "Portfolio Website",
+    detail:
+      "Improving my personal portfolio with React, TypeScript, responsive design, animations, and better user experience.",
+    href: "https://www.yiyongsinh.online/",
+    hrefLabel: "View Website",
+  },
+
+  {
+    id: "now-warehouse",
+    kind: "building",
+    title: "Warehouse Management API",
+    detail:
+      "Developing inventory management, sales order workflows, stock tracking, and business logic using Node.js, TypeScript, and PostgreSQL.",
+    href: "https://github.com/sinh3784-a11y/POS-SYSTEM-BACKEND",
+    hrefLabel: "View Code"
+  },
+
+  {
+    id: "now-chang",
+    kind: "building",
+    title: "Chang Application",
+    detail:
+      "Building a service marketplace connecting customers with technicians, featuring authentication, bookings, and role-based access control.",
+    href: "https://github.com/Chang-Applicatin",
+    hrefLabel: "View Code"
+  },
+
+  // ==========================================
+  // CURRENT LEARNING
+  // ==========================================
+
+  {
+    id: "now-typescript",
+    kind: "learning",
+    title: "Advanced TypeScript",
+    detail:
+      "Improving my understanding of generics, type inference, reusable interfaces, and type-safe backend development.",
+  },
+
+  {
+    id: "now-database",
+    kind: "learning",
+    title: "Database Optimization",
+    detail:
+      "Exploring PostgreSQL indexing, query execution plans, SQL optimization, and efficient relational database design.",
+  },
+
+  {
+    id: "now-testing",
+    kind: "learning",
+    title: "Backend Testing",
+    detail:
+      "Practicing unit testing, integration testing, API validation, error handling, and writing reliable backend services.",
+  },
+];

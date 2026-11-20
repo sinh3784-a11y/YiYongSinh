@@ -31,8 +31,8 @@ function Hero() {
     /* Two layers, two rates: the code card drifts further than the text so the
        hero gains depth as you scroll away from it. `speed` above 1 means faster
        than the page itself. */
-    useParallax(contentRef, { speed: 0.55 })
-    useParallax(visualRef, { speed: 1.15 })
+    // useParallax(contentRef, { speed: 0.55 })
+    // useParallax(visualRef, { speed: 1.15 })
 
     /* The marquee is the hero tech list twice, with the second copy hidden from
        assistive tech — a screen reader should not hear "React" eight times. */
@@ -60,6 +60,12 @@ function Hero() {
                 <p className="hero-role">
                     {profile.role}
                     <span> {profile.roleAccent}</span>
+                </p>
+                <p className="hero-education">
+                    <Icon name="graduation-cap" />
+                    <span>
+                        Thired-Year Computer Science Student · RUPP
+                    </span>
                 </p>
 
                 <p className="hero-description">{profile.tagline}</p>
@@ -121,12 +127,12 @@ function Hero() {
             </div>
 
             <div ref={visualRef} className="hero-visual">
-                <div className="hero-portrait">
+                <div className="hero-portrait animated-portrait-border">
                     {/* Decorative: the tinted panel behind the cutout carries no
                         meaning a screen reader needs. It is a sibling of the
                         image, not a wrapper, so `aria-hidden` on it hides only
                         the panel and leaves the photo announced normally. */}
-                    <div className="hero-portrait-panel" aria-hidden="true" />
+                    <div className="hero-portrait-panel portrait-border-animated" aria-hidden="true" />
 
                     <img
                         src={profile.portrait?.src ?? "/profile.webp"}

@@ -1,7 +1,7 @@
 import type { SocialIcon } from "../types/profile"
 import type { SVGProps } from "react"
 
-type UiIcon = "external" | "arrow-up" | "menu" | "close" | "sun" | "moon" | "check"
+type UiIcon = "external" | "arrow-up" | "menu" | "close" | "sun" | "moon" | "check" | "graduation-cap"
 
 export type IconName = SocialIcon | UiIcon
 
@@ -19,6 +19,8 @@ const FILLED: Record<SocialIcon, string> = {
     x: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
     email:
         "M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v.4l8 5 8-5V6H4z",
+    facebook:
+        "M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.19 2.23.19v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12Z",
 }
 
 /** Interface glyphs, drawn as strokes on a 24x24 grid. */
@@ -32,6 +34,10 @@ const STROKED: Record<UiIcon, string> = {
        glyph, so it lines up with the sun next to it. */
     moon: "M20.4 14.6A8.6 8.6 0 019.4 3.6a8.6 8.6 0 1011 11z",
     check: "M5 12.8l4.4 4.4L19 7.5",
+
+    "graduation-cap":
+        "M22 10v6 M2 10l10-5 10 5-10 5-10-5 M6 12v5c3 3 9 3 12 0v-5",
+
 }
 
 function isUiIcon(name: IconName): name is UiIcon {

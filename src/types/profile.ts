@@ -1,4 +1,4 @@
-export type SocialIcon = "github" | "linkedin" | "x" | "email"
+export type SocialIcon = "github" | "linkedin" | "x" | "email" | "facebook"
 
 export interface SocialLink {
     id: string

@@ -1,4 +1,4 @@
-import type { Profile } from "../types/profile"
+import type { Profile } from "../types/profile";
 
 /* ------------------------------------------------------------------ *
  *  EDIT THIS FILE FIRST.
@@ -9,28 +9,32 @@ import type { Profile } from "../types/profile"
  * ------------------------------------------------------------------ */
 
 export const profile: Profile = {
-    name: "Yi YongSinh",
-    initials: "YS",
+  name: "Yi YongSinh",
+  initials: "YS",
 
-    role: "Backend Developer",
-    roleAccent: "& Full-Stack Learner",
+  role: "Backend Developer",
+  roleAccent: "& Full-Stack Learner",
 
-    tagline: "I build secure, production-ready APIs and turn them into interfaces people actually enjoy using.",
+  tagline:
+    "I build secure, production-ready APIs and turn them into interfaces people actually enjoy using.",
 
-    bio: "I build modern web applications with Java, Spring Boot, React and TypeScript. I care about clean APIs, sane database schemas, and shipping things that survive contact with real users.",
+  bio: "I build modern web applications with Java, Spring Boot, React and TypeScript. I care about clean APIs, sane database schemas, and shipping things that survive contact with real users.",
 
-    about: [
-        "I started out writing PHP and SQL, and quickly fell into backend work — designing schemas, wiring up REST endpoints, and debugging the kind of problems that only show up under production load.",
-        "Most of my time is spent in the Java and Spring Boot ecosystem. I like the boring, dependable parts of backend engineering: validation, error handling, authentication and query tuning.",
-        "On the frontend I work in React and TypeScript. Not because I had to, but because a backend engineer who can build their own UI ships much faster than one waiting on a handoff.",
-        "Right now I am deep in Laravel and PostgreSQL, containerising everything with Docker, and treating this portfolio as one more thing to learn from rather than one more thing to maintain.",
-    ],
+  about: [
+    "I am a Computer Science student at the Royal University of Phnom Penh with a strong interest in backend development. My programming journey started with PHP and SQL, and I have expanded my experience through hands-on projects using Java, Spring Boot, Laravel, and Node.js.",
 
-    location: "Cambodia",
-    email: "sinh3784@gmail.com",             // <-- REPLACE
-    openToWork: true,
+    "I enjoy designing relational databases, developing RESTful APIs, implementing authentication and authorization, and organizing business logic into clean, maintainable code. I focus on building reliable applications with proper validation and error handling.",
 
-    /* Hero portrait, shown in the visual column instead of the code card.
+    "Alongside backend development, I work with React and TypeScript to build responsive user interfaces and integrate them with backend services. This allows me to understand the full development process, from database design to user experience.",
+
+    "Currently, I am strengthening my skills in backend architecture, API testing, PostgreSQL, database optimization, and Docker-based deployment. My goal is to become a skilled backend developer by continuously learning, solving practical problems, and building applications that people can use.",
+  ],
+
+  location: "Cambodia",
+  email: "sinh3784@gmail.com", // <-- REPLACE
+  openToWork: true,
+
+  /* Hero portrait, shown in the visual column instead of the code card.
        `width`/`height` must match the real file — they are what stops the
        hero from reflowing as the photo loads, so a resend of the image means
        updating these two numbers too.
@@ -45,63 +49,69 @@ export const profile: Profile = {
        `alt` is empty because the hero's <h1> already reads the name; a
        description would just announce it twice. Delete this whole block to
        bring the code card back. */
-    portrait: {
-        src: "/profile.webp",
-        alt: "",
-        width: 800,
-        height: 871,
+  portrait: {
+    src: "/profile.webp",
+    alt: "",
+    width: 800,
+    height: 871,
+  },
+
+  // Drop a hosted PDF (Drive, GitHub raw, S3) here and the hero
+  // gains a "Résumé" button. Delete the line to remove it.
+  resumeUrl: undefined,
+
+  socials: [
+    {
+      id: "github",
+      label: "GitHub",
+      href: "https://github.com/sinh3784-a11y", // <-- REPLACE
+      icon: "github",
     },
+    {
+      id: "linkedin",
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/yi-yongsinh-85371b420/", // <-- REPLACE
+      icon: "linkedin",
+    },
+    {
+      id: "x",
+      label: "X",
+      href: "https://x.com/sinh3784", // <-- REPLACE
+      icon: "x",
+    },
+    {
+      id: "email",
+      label: "Email",
+      href: "mailto:sinh3784@gmail.com", // <-- REPLACE
+      icon: "email",
+    },
+    {
+      id: "facebook",
+      label: "Facebook",
+      href: "https://web.facebook.com/bro.bkgaming.50",
+      icon: "facebook",
+    },
+  ],
 
-    // Drop a hosted PDF (Drive, GitHub raw, S3) here and the hero
-    // gains a "Résumé" button. Delete the line to remove it.
-    resumeUrl: undefined,
-
-    socials: [
-        {
-            id: "github",
-            label: "GitHub",
-            href: "https://github.com/sinh3784-a11y",       // <-- REPLACE
-            icon: "github",
-        },
-        {
-            id: "linkedin",
-            label: "LinkedIn",
-            href: "https://www.linkedin.com/in/yi-yongsinh-85371b420/",   // <-- REPLACE
-            icon: "linkedin",
-        },
-        {
-            id: "x",
-            label: "X",
-            href: "https://x.com/sinh3784",            // <-- REPLACE
-            icon: "x",
-        },
-        {
-            id: "email",
-            label: "Email",
-            href: "mailto:sinh3784@gmail.com",               // <-- REPLACE
-            icon: "email",
-        },
-    ],
-
-    /* ---------------------------------------------------------------- *
-     *  CONTACT FORM
-     *  1. Create a free form at https://formspree.io
-     *  2. Copy the form ID out of the endpoint it gives you, e.g.
-     *        https://formspree.io/f/xjvqzkwl
-     *                  ^^^^^^^^^^^ this part
-     *  3. Paste it below. Until you do, the form shows a setup
-     *     notice and does not attempt to send anything.
-     * ---------------------------------------------------------------- */
-    formspreeId: "YOUR_FORM_ID",
-}
+  /* ---------------------------------------------------------------- *
+   *  CONTACT FORM
+   *  1. Create a free form at https://formspree.io
+   *  2. Copy the form ID out of the endpoint it gives you, e.g.
+   *        https://formspree.io/f/xjvqzkwl
+   *                  ^^^^^^^^^^^ this part
+   *  3. Paste it below. Until you do, the form shows a setup
+   *     notice and does not attempt to send anything.
+   * ---------------------------------------------------------------- */
+  formspreeId: "YOUR_FORM_ID",
+};
 
 /** Contact section heading, kept next to the profile it belongs to. */
 export const contactCopy = {
-    label: "GET IN TOUCH",
-    title: "Let's build something together",
-    body: "Have a project, an opportunity, or a question about an approach you are weighing? Send a message and I will reply within a couple of days.",
-    detailsLabel: "Elsewhere",
-}
+  label: "GET IN TOUCH",
+  title: "Let's build something together",
+  body: "Have a project, an opportunity, or a question about an approach you are weighing? Send a message and I will reply within a couple of days.",
+  detailsLabel: "Elsewhere",
+};
 
 /**
  * Hero copy. Kept beside `profile` because it describes the same person — the
@@ -109,41 +119,47 @@ export const contactCopy = {
  * a screen reader announces, so none of them belong in the component.
  */
 export const heroCopy = {
-    greeting: "Hello, I'm",
-    availability: "Available for new work",
-    primaryCta: "View my projects",
-    secondaryCta: "Get in touch",
-    resumeCta: "Résumé",
-    socialsLabel: "Elsewhere on the web",
-    techLabel: "Technologies",
-}
+  greeting: "Hello, I'm",
+  availability: "Available for new work",
+  primaryCta: "View my projects",
+  secondaryCta: "Get in touch",
+  resumeCta: "Résumé",
+  socialsLabel: "Elsewhere on the web",
+  techLabel: "Technologies",
+};
 
 /** The tech marquee in the hero. Also the loop length of the CSS animation. */
 export const heroTech = [
-    "Java",
-    "Spring Boot",
-    "Laravel",
-    "PHP",
-    "PostgreSQL",
-    "Docker",
-    "React",
-    "TypeScript",
-]
+  "Java",
+  "Spring Boot",
+  "Laravel",
+  "PHP",
+  "Node.js",
+  "Express.js",
+  "PostgreSQL",
+  "MySQL",
+  "Docker",
+  "React",
+  "TypeScript",
+  "JavaScript",
+  "JQuery",
+];
 
 export const footerCopy = {
-    blurb: "Backend developer building secure APIs and the interfaces that sit on top of them.",
-    /** Visible label on the link that returns to the top of the page. */
-    backToTop: "Back to top",
-    /**
-     * Accessible name for the monogram link. Named after the person rather than
-     * the destination, so it does not collide with `backToTop` — two links in
-     * the same landmark sharing an accessible name are ambiguous to tab between.
-     */
-    logoLabel: `${profile.name} — back to top`,
-    /** Landmark names for the two lists in the footer. */
-    navLabel: "Footer",
-    socialsLabel: "Social links",
-}
+  blurb:
+    "Backend developer building secure APIs and the interfaces that sit on top of them.",
+  /** Visible label on the link that returns to the top of the page. */
+  backToTop: "Back to top",
+  /**
+   * Accessible name for the monogram link. Named after the person rather than
+   * the destination, so it does not collide with `backToTop` — two links in
+   * the same landmark sharing an accessible name are ambiguous to tab between.
+   */
+  logoLabel: `${profile.name} — back to top`,
+  /** Landmark names for the two lists in the footer. */
+  navLabel: "Footer",
+  socialsLabel: "Social links",
+};
 
 /**
  * Copyright line for the footer. The year arrives as an argument because the
@@ -152,5 +168,5 @@ export const footerCopy = {
  * across New Year.
  */
 export function footerCopyright(year: number): string {
-    return `© ${year} ${profile.name}`
+  return `© ${year} ${profile.name}`;
 }
