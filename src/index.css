@@ -1057,6 +1057,135 @@ a {
   font-size: 0.9rem;
   line-height: 1.7;
 }
+/* =====================================
+   ABOUT SECTION - MOBILE RESPONSIVE
+===================================== */
+
+@media (max-width: 600px) {
+
+  .about {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  /* Statistics Container */
+  .about .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    margin-inline: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Individual Statistic */
+  .about .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    padding: 18px 8px;
+    text-align: center;
+
+    border-radius: 14px;
+  }
+
+  /* Number */
+  .about .stat > :first-child {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 1.2;
+  }
+
+  /* Label */
+  .about .stat-label {
+    display: block;
+
+    max-width: 100%;
+    margin-top: 8px;
+
+    font-size: 0.68rem;
+    line-height: 1.45;
+    text-align: center;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* About Content */
+  .about .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .about .about-narrative,
+  .about .about-aside {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .about .about-narrative p {
+    overflow-wrap: break-word;
+  }
+}
+
+
+/* =====================================
+   ABOUT SECTION - MOBILE SPACING
+===================================== */
+
+@media (max-width: 768px) {
+
+  #about {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    /* Space from both screen edges */
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  #about h2,
+  #about h3,
+  #about p {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  #about > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+/* Extra-small iPhones */
+@media (max-width: 375px) {
+  #about {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+
+
+
 
 /* =========================
    NOW
