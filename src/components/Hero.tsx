@@ -1,7 +1,6 @@
 import { useRef } from "react"
 import { heroCopy, heroTech, profile } from "../data/profile"
 import { useMagnetic } from "../hooks/useMagnetic"
-import { useParallax } from "../hooks/useParallax"
 import type { CSSVars } from "../types/css"
 import Icon from "./Icon"
 import Words from "./Words"
